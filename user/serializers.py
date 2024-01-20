@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import User
+from cart.models import *
+from .models import *
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,3 +11,13 @@ class LoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'password')
+
+# class PizzaSerializer(serializers.ModelSerializer):
+#     ingredients = serializers.PrimaryKeyRelatedField(many=True, queryset=Ingredient.objects.all(), required=False)
+#     class Meta:
+#         model = Pizza
+#         fields = ('name', 'ingredients')
+#
+#
+
+

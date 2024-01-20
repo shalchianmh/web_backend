@@ -4,10 +4,10 @@ from user.models import User
 
 class Good(models.Model):
     item_id = models.AutoField(primary_key=True)
-    image = models.ImageField(upload_to='items')
+    image = models.ImageField(upload_to='items', blank=True, null=True)
     name = models.CharField(max_length=250)
-    description = models.TextField()
-    price = models.IntegerField()
+    description = models.TextField(blank=True, null=True)
+    price = models.IntegerField(blank=True, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -19,7 +19,7 @@ class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     price = models.IntegerField()
     date_created = models.DateTimeField(auto_now_add=True)
-    goods = models.ManyToManyField(Good)
+    goods = models.ManyToManyField(Good, through='CartItem')
     is_current = models.BooleanField(default=False)
     # slug = models.SlugField(unique=True)
 
@@ -42,12 +42,13 @@ class Ingredient(models.Model):
     title = models.CharField(max_length=250)
     price = models.IntegerField()
     date_created = models.DateTimeField(auto_now_add=True)
-
+    def __str__(self):
+        return f"{self.ingredient_id}"
 
 class Pizza(Good):
     pizza_id = models.AutoField(primary_key=True)
-    ingredients = models.ManyToManyField(Ingredient)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE)
+    ingredients = models.ManyToManyField(Ingredient, blank=True, null=True)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     # def __str__(self):
     #     return self.slug
     #

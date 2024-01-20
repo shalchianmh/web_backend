@@ -1,4 +1,10 @@
 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from cart.models import Pizza
+from cart.serializers import PizzaSerializer
+
+
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -54,3 +60,13 @@ class UserProfileView(APIView):
         user = request.user  # Get the authenticated user
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_pizza(request):
+    serializer = PizzaSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save(creator=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
