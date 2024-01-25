@@ -8,6 +8,12 @@ from .views import *
 
 urlpatterns = [
     path('add_good/', add_good, name='add_good'),
+    path('pizzas/', PizzaCRUDView.as_view(), name='pizza-crud'),
+    path('pizzas/<pk>', PizzaDetailCRUDView.as_view(), name='pizza-crud'),
+    path('ingredients/', IngredientCRUDView.as_view(), name='ingredient-crud'),
+    path('ingredients/<pk>', IngredientDetailCRUDView.as_view(), name='ingredient-crud'),
+    path('pizza-ingredients/', PizzaIngredientCRUDView.as_view(), name='pizza-ingredient-crud'),
+    path('pizza-ingredients/<pk>', PizzaIngredientDetailCRUDView.as_view(), name='pizza-ingredient-crud'),
     # path('', include(router.urls)),
     # Other URL patterns as needed
 ]
