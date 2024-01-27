@@ -11,21 +11,23 @@ from rest_framework import generics
 from .serializers import *
 
 
+@permission_classes([IsAuthenticated])
 class GetActiveCart(
     generics.ListAPIView
 ):
     serializer_class = CartSerializer
     def get_queryset(self):
-        return Cart.objects.filter(user=self.kwargs['pk'], is_current=True)
+        return Cart.objects.filter(user=self.request.user, is_current=True)
 
     def list(self, request, *args, **kwargs):
-        cart, created = Cart.objects.get_or_create(user_id=self.kwargs['pk'], is_current=True, defaults={'price':0})
+        cart, created = Cart.objects.get_or_create(user=request.user, is_current=True, defaults={'price':0})
         cart.save()
 
         serializer = self.get_serializer(cart)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+@permission_classes([IsAuthenticated])
 class AddGoodToCart(
     generics.CreateAPIView
 ):
@@ -33,16 +35,19 @@ class AddGoodToCart(
     serializer_class = CartGoodSerializer
 
     def create(self, request, *args, **kwargs):
-        cart_id = request.data.get('cart')
+        user = request.user
+        cart, created = Cart.objects.get_or_create(user=user, is_current=True, defaults={'price': 0})
+        cart.save()
+        # cart_id = request.data.get('cart')
         try:
             quantity = int(request.data.get('quantity', 1))
         except:
             return Response({"error": "Invalid quantity format"}, status=status.HTTP_400_BAD_REQUEST)
         good_id = request.data.get('good')
-        try:
-            cart = Cart.objects.get(pk=cart_id)
-        except Cart.DoesNotExist:
-            return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
+        # try:
+        #     cart = Cart.objects.get(pk=cart_id)
+        # except Cart.DoesNotExist:
+        #     return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
         try:
             good = Good.objects.get(pk=good_id)
         except Good.DoesNotExist:
@@ -57,6 +62,7 @@ class AddGoodToCart(
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+@permission_classes([IsAuthenticated])
 class DelGoodFromCart(
     generics.CreateAPIView
 ):
@@ -64,16 +70,19 @@ class DelGoodFromCart(
     serializer_class = CartGoodSerializer
 
     def create(self, request, *args, **kwargs):
-        cart_id = request.data.get('cart')
+        # cart_id = request.data.get('cart')
+        user = request.user
+        cart, created = Cart.objects.get_or_create(user=user, is_current=True, defaults={'price': 0})
+        cart.save()
         good_id = request.data.get('good')
         try:
             quantity = int(request.data.get('quantity', 1))
         except:
             return Response({"error": "Invalid quantity format"}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            cart = Cart.objects.get(pk=cart_id)
-        except Cart.DoesNotExist:
-            return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
+        # try:
+        #     cart = Cart.objects.get(pk=cart_id)
+        # except Cart.DoesNotExist:
+        #     return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
         try:
             good = Good.objects.get(pk=good_id)
         except Good.DoesNotExist:

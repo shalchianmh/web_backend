@@ -11,7 +11,6 @@ from rest_framework import generics
 from .serializers import *
 
 
-
 class PizzaCRUDView(
     generics.ListCreateAPIView
 ):
@@ -51,8 +50,6 @@ class IngredientDetailCRUDView(
     serializer_class = IngredientSerializer
 
 
-# pizza ingredient view
-
 class PizzaIngredientCRUDView(
     generics.ListAPIView
 ):
@@ -67,6 +64,11 @@ class PizzaIngredientDetailCRUDView(
     serializer_class = PizzaIngredientSerializer
 
 
+###############################
+### aboves are so dangerous ###
+###############################
+
+@permission_classes([IsAuthenticated])
 class AddPizzaIngredient(
     generics.CreateAPIView
 ):
@@ -84,6 +86,8 @@ class AddPizzaIngredient(
             pizza = Pizza.objects.get(pk=pizza_id)
         except Pizza.DoesNotExist:
             return Response({"error": "Pizza not found"}, status=status.HTTP_404_NOT_FOUND)
+        if pizza.creator is not request.user: return Response({"error": "Pizza not found"},
+                                                              status=status.HTTP_404_NOT_FOUND)
         try:
             ingredient = Ingredient.objects.get(pk=ingredient_id)
         except Ingredient.DoesNotExist:
@@ -98,7 +102,7 @@ class AddPizzaIngredient(
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-
+@permission_classes([IsAuthenticated])
 class DelPizzaIngredient(
     generics.CreateAPIView
 ):
@@ -116,6 +120,8 @@ class DelPizzaIngredient(
             pizza = Pizza.objects.get(pk=pizza_id)
         except Pizza.DoesNotExist:
             return Response({"error": "Pizza not found"}, status=status.HTTP_404_NOT_FOUND)
+        if pizza.creator is not request.user: return Response({"error": "Pizza not found"},
+                                                              status=status.HTTP_404_NOT_FOUND)
         try:
             ingredient = Ingredient.objects.get(pk=ingredient_id)
         except Ingredient.DoesNotExist:
