@@ -1,13 +1,11 @@
 from django.db import models
-from cart.models import *
+from user.models import User
 
 class Ingredient(models.Model):
     ingredient_id = models.AutoField(primary_key=True)
-    image = models.ImageField(upload_to='items', null=True, blank=True)
     title = models.CharField(max_length=250)
+    image = models.ImageField(upload_to='items', null=True, blank=True)
     price = models.IntegerField()
-    date_created = models.DateTimeField(auto_now_add=True)
-
     def __str__(self):
         return f"{self.ingredient_id}"
 

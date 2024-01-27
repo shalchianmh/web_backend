@@ -1,0 +1,17 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+/cart/__pycache__/
+cart/migrations/
+cart/migrations/__pycache__/
+manager/__pycache__/
+manager/migrations/__pycache__/
+order/__pycache__/
+order/migrations/
+order/migrations/__pycache__/
+shop/__pycache__/
+shop/migrations/
+shop/migrations/__pycache__/
+user/__pycache__/
+user/migrations/
+user/migrations/__pycache__/
+web_backend/__pycache__/
