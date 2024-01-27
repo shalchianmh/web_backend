@@ -1,8 +1,7 @@
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from cart.models import Pizza
-from cart.serializers import PizzaSerializer
+
 
 
 from rest_framework import generics, permissions, status
@@ -14,6 +13,7 @@ from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
 from .models import User
 from .serializers import *
+from shop.serializers import *
 
 @method_decorator(csrf_exempt, name='dispatch')
 class RegistrationView(generics.CreateAPIView):

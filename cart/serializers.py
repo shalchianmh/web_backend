@@ -1,25 +1,9 @@
 from rest_framework import serializers
 from .models import *
+from django.shortcuts import get_object_or_404
 
 
-class IngredientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Ingredient
-        fields = '__all__'
 
-
-class PizzaSerializer(serializers.ModelSerializer):
-    ingredients = IngredientSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Pizza
-        fields = ['name', 'description', 'price', 'ingredients', 'creator']
-
-
-class CartSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Cart
-        fields = '__all__'
 
 
 class GoodSerializer(serializers.ModelSerializer):
@@ -28,7 +12,15 @@ class GoodSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PizzaIngredientSerializer(serializers.ModelSerializer):
+class CartGoodSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PizzaIngredient
+        model = CartGood
+        fields = "__all__"
+
+
+class CartSerializer(serializers.ModelSerializer):
+    goods = CartGoodSerializer(many=True)
+
+    class Meta:
+        model = Cart
         fields = '__all__'

@@ -7,7 +7,55 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from order.models import *
 from .models import *
-from .serializers import CartSerializer
+from rest_framework import generics
+from .serializers import *
+
+
+class GetActiveCart(
+    generics.ListAPIView
+):
+    serializer_class = CartSerializer
+    def get_queryset(self):
+        return Pizza.objects.filter(user=self.kwargs['pk'], is_current=True)
+
+    def list(self, request, *args, **kwargs):
+        cart, created = Cart.objects.get_or_create(user_id=self.kwargs['pk'], is_current=True, defaults={'price':0})
+        cart.save()
+
+        serializer = self.get_serializer(cart)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class AddGoodToCart(
+    generics.CreateAPIView
+):
+    queryset = CartGood.objects.all()
+    serializer_class = CartGoodSerializer
+
+    def create(self, request, *args, **kwargs):
+        cart_id = request.data.get('cart')
+        try:
+            quantity = int(request.data.get('quantity', 1))
+        except:
+            return Response({"error": "Invalid quantity format"}, status=status.HTTP_400_BAD_REQUEST)
+        good_id = request.data.get('good')
+        try:
+            cart = Cart.objects.get(pk=cart_id)
+        except Cart.DoesNotExist:
+            return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            good = Good.objects.get(pk=good_id)
+        except Good.DoesNotExist:
+            return Response({"error": "Good not found"}, status=status.HTTP_404_NOT_FOUND)
+        cart_good, created = CartGood.objects.get_or_create(cart=cart, good=good)
+        cart_good.quantity += quantity
+        cart.price += quantity * good.price
+        cart_good.save()
+        cart.save()
+
+        serializer = self.get_serializer(cart)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 @api_view(['POST'])
@@ -21,7 +69,7 @@ def add_good(request):
 
     good = get_object_or_404(Good, pk=good_id)
 
-    cart_item_queryset = CartItem.objects.filter(cart=cart, good=good)
+    cart_item_queryset = CartGood.objects.filter(cart=cart, good=good)
 
     if cart_item_queryset.exists():
         # If there are multiple instances, choose the first one
@@ -30,7 +78,7 @@ def add_good(request):
         cart_item.save()
     else:
         # If no instance is found, create a new one
-        cart_item = CartItem.objects.create(cart=cart, good=good, quantity=quantity)
+        cart_item = CartGood.objects.create(cart=cart, good=good, quantity=quantity)
 
     cart.price += good.price * quantity
     cart.save()
@@ -40,47 +88,8 @@ def add_good(request):
 
 
 # views.py
-from rest_framework import generics
-from .serializers import *
 
 
-class PizzaCRUDView(
-    generics.ListCreateAPIView
-):
-    queryset = Pizza.objects.all()
-    serializer_class = PizzaSerializer
+# pizza view
 
 
-class PizzaDetailCRUDView(
-    generics.RetrieveUpdateDestroyAPIView
-):
-    queryset = Pizza.objects.all()
-    serializer_class = PizzaSerializer
-
-
-class IngredientCRUDView(
-    generics.ListCreateAPIView
-):
-    queryset = Ingredient.objects.all()
-    serializer_class = IngredientSerializer
-
-
-class IngredientDetailCRUDView(
-    generics.RetrieveUpdateDestroyAPIView
-):
-    queryset = Ingredient.objects.all()
-    serializer_class = IngredientSerializer
-
-
-class PizzaIngredientCRUDView(
-    generics.ListCreateAPIView
-):
-    queryset = PizzaIngredient.objects.all()
-    serializer_class = PizzaIngredientSerializer
-
-
-class PizzaIngredientDetailCRUDView(
-    generics.RetrieveUpdateDestroyAPIView
-):
-    queryset = PizzaIngredient.objects.all()
-    serializer_class = PizzaIngredientSerializer
