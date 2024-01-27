@@ -7,8 +7,8 @@ from .views import *
 # router.register(r'carts', CartViewSet, basename='cart')
 
 urlpatterns = [
-    path('add_good/', add_good, name='add_good'),
     path('get-active-cart/<pk>', GetActiveCart.as_view(), name='user-active-cart'),
+    path('add-good-to-cart/', AddGoodToCart.as_view(), name='add-good-to-cart'),
     # path('', include(router.urls)),
     # Other URL patterns as needed
 ]

@@ -15,11 +15,11 @@ class GoodSerializer(serializers.ModelSerializer):
 class CartGoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartGood
-        fields = "__all__"
+        fields = ['cart', 'good', 'quantity']
 
 
 class CartSerializer(serializers.ModelSerializer):
-    goods = CartGoodSerializer(many=True)
+    goods = GoodSerializer(many=True)
 
     class Meta:
         model = Cart

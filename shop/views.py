@@ -94,7 +94,7 @@ class AddPizzaIngredient(
         pizza_ingredient.save()
         pizza.save()
 
-        serializer = self.get_serializer(pizza)
+        serializer = PizzaSerializer(pizza)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -138,6 +138,6 @@ class DelPizzaIngredient(
         if pizza_ingredient.quantity == 0:
             pizza_ingredient.delete()
             return Response("deleted successfully", status=status.HTTP_200_OK)
-        serializer = self.get_serializer(pizza_ingredient)
+        serializer = PizzaSerializer(pizza)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

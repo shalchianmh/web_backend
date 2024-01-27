@@ -16,7 +16,7 @@ class GetActiveCart(
 ):
     serializer_class = CartSerializer
     def get_queryset(self):
-        return Pizza.objects.filter(user=self.kwargs['pk'], is_current=True)
+        return Cart.objects.filter(user=self.kwargs['pk'], is_current=True)
 
     def list(self, request, *args, **kwargs):
         cart, created = Cart.objects.get_or_create(user_id=self.kwargs['pk'], is_current=True, defaults={'price':0})
@@ -53,43 +53,103 @@ class AddGoodToCart(
         cart_good.save()
         cart.save()
 
-        serializer = self.get_serializer(cart)
+        serializer = CartSerializer(cart)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+class DelGoodFromCart(
+    generics.CreateAPIView
+):
+    queryset = CartGood.objects.all()
+    serializer_class = CartGoodSerializer
+
+    def create(self, request, *args, **kwargs):
+        cart_id = request.data.get('cart')
+        good_id = request.data.get('good')
+        try:
+            quantity = int(request.data.get('quantity', 1))
+        except:
+            return Response({"error": "Invalid quantity format"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            cart = Cart.objects.get(pk=cart_id)
+        except Cart.DoesNotExist:
+            return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            good = Good.objects.get(pk=good_id)
+        except Good.DoesNotExist:
+            return Response({"error": "Good not found"}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            cart_good = CartGood.objects.get(cart=cart, good=good)
+
+        except CartGood.DoesNotExist:
+            return Response({"error": "CartGood not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        if cart_good.quantity < quantity:
+            return Response({"error": "CartGood quantity is less than delete amount"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        cart_good.quantity -= quantity
+        cart.price -= quantity * good.price
+        cart_good.save()
+        cart.save()
+
+        if cart_good.quantity == 0:
+            cart_good.delete()
+            return Response("deleted successfully", status=status.HTTP_200_OK)
+        serializer = CartSerializer(cart)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def add_good(request):
-    user = request.user
-    cart, created = Cart.objects.get_or_create(user=user, is_current=True)
-
-    good_id = request.data.get('good_id')
-    quantity = int(request.data.get('quantity', 1))
-
-    good = get_object_or_404(Good, pk=good_id)
-
-    cart_item_queryset = CartGood.objects.filter(cart=cart, good=good)
-
-    if cart_item_queryset.exists():
-        # If there are multiple instances, choose the first one
-        cart_item = cart_item_queryset.first()
-        cart_item.quantity += quantity
-        cart_item.save()
-    else:
-        # If no instance is found, create a new one
-        cart_item = CartGood.objects.create(cart=cart, good=good, quantity=quantity)
-
-    cart.price += good.price * quantity
-    cart.save()
-
-    serializer = CartSerializer(cart)
-    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# views.py
 
 
-# pizza view
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def add_good(request):
+#     user = request.user
+#     cart, created = Cart.objects.get_or_create(user=user, is_current=True)
+#
+#     good_id = request.data.get('good_id')
+#     quantity = int(request.data.get('quantity', 1))
+#
+#     good = get_object_or_404(Good, pk=good_id)
+#
+#     cart_item_queryset = CartGood.objects.filter(cart=cart, good=good)
+#
+#     if cart_item_queryset.exists():
+#         # If there are multiple instances, choose the first one
+#         cart_item = cart_item_queryset.first()
+#         cart_item.quantity += quantity
+#         cart_item.save()
+#     else:
+#         # If no instance is found, create a new one
+#         cart_item = CartGood.objects.create(cart=cart, good=good, quantity=quantity)
+#
+#     cart.price += good.price * quantity
+#     cart.save()
+#
+#     serializer = CartSerializer(cart)
+#     return Response(serializer.data, status=status.HTTP_200_OK)
+#
 
