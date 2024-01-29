@@ -11,5 +11,7 @@ urlpatterns = [
     # path('pizza-ingredients/<pk>', PizzaIngredientDetailCRUDView.as_view(), name='pizza-ingredient-crud'),
     # path('pizza-ingredients-add/', AddPizzaIngredient.as_view(), name='pizza-ingredient-add'),
     # path('pizza-ingredients-del/', DelPizzaIngredient.as_view(), name='pizza-ingredient-del'),
+    # path('my_view/', my_view, name='my_view'),
     path('calculate-price/', CalculatePrice.as_view(), name='calculate-price'),
+
 ]

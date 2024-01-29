@@ -2,6 +2,7 @@ from django.db import models
 from user.models import User
 from cart.models import *
 
+
 class Order(models.Model):
     STATUSES = [
         (u'E', u'Expected'),

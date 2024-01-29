@@ -2,6 +2,10 @@ from rest_framework import serializers
 from .models import *
 
 
+class AddPizzaToCartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = []
 
 class CartPizzaSerializer(serializers.ModelSerializer):
     class Meta:

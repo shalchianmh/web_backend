@@ -12,7 +12,7 @@ class Ingredient(models.Model):
 class Pizza(models.Model):
     pizza_id = models.AutoField(primary_key=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    image = models.ImageField(upload_to='items', blank=True, null=True)
+    image = models.ImageField(upload_to='items', blank=True, null=True, default=None)
     name = models.CharField(max_length=250, null=True)
     price = models.PositiveIntegerField(max_length=250, default=0)
     def __str__(self):

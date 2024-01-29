@@ -103,5 +103,38 @@ class CalculatePrice(APIView):
         return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
+# def my_view(request):
+#     ing = Ingredient(title='cheese', price=10000 ,image=None)
+#     ing.save()
+#
+#     ing = Ingredient(title='pepperoni', price=15000, image=None)
+#     ing.save()
+#
+#     ing = Ingredient(title='olive', price=1000, image=None)
+#     ing.save()
+#
+#     ing = Ingredient(title='corn', price=1000, image=None)
+#     ing.save()
+#
+#     ing = Ingredient(title='mushroom', price=3000, image=None)
+#     ing.save()
+#
+#     ing = Ingredient(title='greenPepper', price=2000, image=None)
+#     ing.save()
+#
+#     ing = Ingredient(title='jambon', price=15000, image=None)
+#     ing.save()
+#
+#     ing = Ingredient(title='bacon', price=20000, image=None)
+#     ing.save()
+#
+#     ing = Ingredient(title='sausage', price=13000, image=None)
+#     ing.save()
+#
+#     ing = Ingredient(title='tomato', price=7000, image=None)
+#     ing.save()
+#
+#
+
 
 

@@ -6,7 +6,7 @@ from shop.models import Pizza
 class Cart(models.Model):
     cart_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    price = models.IntegerField()
+    price = models.IntegerField(default=0)
     date_created = models.DateTimeField(auto_now_add=True)
     is_current = models.BooleanField(default=False)
 
