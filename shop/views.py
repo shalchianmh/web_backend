@@ -13,72 +13,12 @@ from .serializers import *
 from . import models
 
 
-# class PizzaCRUDView(
-#     generics.ListCreateAPIView
-# ):
-#     queryset = Pizza.objects.all()
-#     serializer_class = PizzaSerializer
-#
-#
-# class PizzaByCreatorCRUDView(
-#     generics.ListAPIView
-# ):
-#     serializer_class = PizzaSerializer
-#
-#     def get_queryset(self):
-#         return Pizza.objects.filter(creator=self.kwargs['pk'])
-#
-#
-# class PizzaDetailCRUDView(
-#     generics.RetrieveUpdateDestroyAPIView
-# ):
-#     queryset = Pizza.objects.all()
-#     serializer_class = PizzaSerializer
-
-
-# ingredient view
-
-# class IngredientCRUDView(
-#     generics.ListCreateAPIView
-# ):
-#     queryset = Ingredient.objects.all()
-#     serializer_class = IngredientSerializer
-#
-#
-# class IngredientDetailCRUDView(
-#     generics.RetrieveUpdateDestroyAPIView
-# ):
-#     queryset = Ingredient.objects.all()
-#     serializer_class = IngredientSerializer
-#
-#
-# class PizzaIngredientCRUDView(
-#     generics.ListAPIView
-# ):
-#     queryset = PizzaIngredient.objects.all()
-#     serializer_class = PizzaIngredientSerializer
-#
-#
-# class PizzaIngredientDetailCRUDView(
-#     generics.RetrieveUpdateDestroyAPIView
-# ):
-#     queryset = PizzaIngredient.objects.all()
-#     serializer_class = PizzaIngredientSerializer
-#
-
-###############################
-### aboves are so dangerous ###
-###############################
-
-
 # @permission_classes([IsAuthenticated])
 class CalculatePrice(APIView):
 
     Serializer = PizzaSerializer
-    # Model = models.Pizza
 
     def post(self, request, *args, **kwargs):
-        # return HttpResponse("Hello world!")
         data = request.data
         price = 20000
         for k in data.keys():
@@ -94,10 +34,8 @@ class CalculatePrice(APIView):
             "name": None,
             "price": price,
         }
-        print(price)
         serializer = PizzaSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)

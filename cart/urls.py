@@ -9,7 +9,8 @@ from .views import *
 urlpatterns = [
     path('get-active-cart/', GetActiveCart.as_view(), name='user-active-cart'),
     path('add-pizza-to-cart/', AddPizzaToCart.as_view(), name='add-pizza-to-cart'),
-    # path('del-good-from-cart/', DelPizzaFromCart.as_view(), name='del-good-from-cart'),
+    path('add-pizza-from-cart/', AddPizzaToCart.as_view(), name='add-pizza-from-cart'),
+    path('sub-pizza-from-cart/', SubPizzaFromCart.as_view(), name='sub-pizza-from-cart'),
     # path('', include(router.urls)),
     # Other URL patterns as needed
 ]
