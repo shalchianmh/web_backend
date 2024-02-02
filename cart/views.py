@@ -62,6 +62,42 @@ class AddPizzaToCart(APIView):
         return price
 
 @permission_classes([IsAuthenticated])
+class AddPizzaToMyPizza(APIView):
+    def post(self, request, *args, **kwargs):
+        user = request.user  # Get the authenticated user
+
+        if user.is_authenticated:
+            data = request.data
+            price = self.calculate_price(data=data)
+            pizza = Pizza(creator=user, name=data['name'], price=price)
+            pizza.save()
+            self.save_pizza_ingredients(data=data, pizza=pizza)
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid'}, status=status.HTTP_401_UNAUTHORIZED)
+    def save_pizza_ingredients(self, data, pizza):
+        for k in data.keys():
+            ingredient = Ingredient.objects.all().filter(title=k).first()
+            if ingredient == None:
+                continue
+            qty = data[k]
+            Ingredient.objects.all().filter(title=k).first()
+            pizza_ingredient = PizzaIngredient(pizza=pizza, quantity=qty, ingredient=ingredient)
+            pizza_ingredient.save()
+
+    def calculate_price(self, data):
+        price = 20000
+        for k in data.keys():
+            ingredient = Ingredient.objects.all().filter(title=k).values('price').first()
+            if ingredient == None:
+                continue
+            qty = data[k]
+            pr = ingredient['price']
+            price += qty * pr
+        return price
+
+
+@permission_classes([IsAuthenticated])
 class GetIngredientsOfPizza(APIView):
     Serializer = GetIngredientsOfPizza
     def post(self, request, *args, **kwargs):
@@ -87,7 +123,7 @@ class GetActiveCart(APIView):
         user = request.user  # Get the authenticated user
 
         if user.is_authenticated:
-            cart = Cart.objects.all().filter(is_current=True).first()
+            cart = Cart.objects.all().filter(user=user, is_current=True).first()
             return_list = []
             price = 0
             if cart != None:
@@ -122,8 +158,10 @@ class GetActiveCart(APIView):
             price += qty * pr
         return pizza_name, price, my_dict
 
+
+# buttons for change value of pizza
 @permission_classes([IsAuthenticated])
-class AddPizzaFromCart(APIView):
+class PizzaFromCart(APIView):
     def post(self, request, *args, **kwargs):
         user = request.user  # Get the authenticated user
 
@@ -131,7 +169,7 @@ class AddPizzaFromCart(APIView):
             data = request.data
             pizza_id = data['pizza_id']
             pizza = Pizza.objects.all().filter(pizza_id=pizza_id).first()
-            cart = Cart.objects.all().filter(is_current=True).first()
+            cart = Cart.objects.all().filter(user=user, is_current=True).first()
             cart_pizza = CartPizza.objects.all().filter(cart=cart, pizza=pizza).first()
             if cart_pizza != None:
                 CartPizza.objects.filter(cart=cart, pizza=pizza).update(quantity=cart_pizza.quantity + 1)
@@ -163,7 +201,7 @@ class SubPizzaFromCart(APIView):
             data = request.data
             pizza_id = data['pizza_id']
             pizza = Pizza.objects.all().filter(pizza_id=pizza_id).first()
-            cart = Cart.objects.all().filter(is_current=True).first()
+            cart = Cart.objects.all().filter(user=user, is_current=True).first()
             cart_pizza = CartPizza.objects.all().filter(cart=cart, pizza=pizza).first()
             print(cart_pizza)
             if cart_pizza != None:

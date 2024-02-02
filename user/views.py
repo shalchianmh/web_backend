@@ -7,11 +7,8 @@ from django.contrib.auth import authenticate, login
 from .serializers import *
 from rest_framework.views import APIView
 
-
-
-
 class RegistrationView(APIView):
-    serializer = UserSerializer
+    serializer = RegisterSerializer
     permission_classes = [permissions.AllowAny]
 
     def post(self, request, *args, **kwargs):
@@ -49,4 +46,22 @@ class UserProfileView(APIView):
         user = request.user  # Get the authenticated user
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+class DuplicateUsername(APIView):
+
+    def post(self, request):
+        pass
+
+@permission_classes([IsAuthenticated])
+class LogOutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def post(self, request):
+        try:
+            request.user.auth_token.delete()
+            return Response(status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
 

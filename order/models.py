@@ -5,8 +5,8 @@ from cart.models import *
 
 class Order(models.Model):
     STATUSES = [
-        (u'E', u'Expected'),
-        (u'P', u'Paid'),
+        (u'Pr', u'Prepared'),
+        (u'Pa', u'Paid'),
         (u'S', u'Sent')
     ]
     order_id = models.AutoField(primary_key=True)
