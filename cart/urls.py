@@ -14,6 +14,5 @@ urlpatterns = [
     path('add-to-my-pizza/', AddPizzaToMyPizza.as_view(), name='add-to-my-pizza'),
     path('delete-pizza-from-my-pizza/', DeletePizzaFromMyPizza.as_view(), name='delete-pizza-from-my-pizza'),
     path('add-my-pizza-to-cart/', AddMyPizzaToCart.as_view(), name='add-my-pizza-to-cart'),
-    # path('', include(router.urls)),
-    # Other URL patterns as needed
+    path('get-my-pizzas/', GetMyPizzas.as_view(), name='get-my-pizzas'),
 ]

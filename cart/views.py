@@ -126,10 +126,11 @@ class GetActiveCart(APIView):
             return_list = []
             price = 0
             if cart != None:
-                pizza_cart_list = CartPizza.objects.all().filter(cart=cart)
+                pizza_cart_list = CartPizza.objects.all().filter(cart=cart).order_by('pizza')
                 for pizza_cart in pizza_cart_list:
                     pizza_name, p, my_dict = self.price_and_ingredients(pizza_cart.pizza_id)
-                    price += p
+                    print(p)
+                    price += p * pizza_cart.quantity
                     my_dict['number'] = pizza_cart.quantity
                     my_dict['pizza_id'] = pizza_cart.pizza_id
                     my_dict['pizza_id'] = pizza_cart.pizza_id
@@ -198,6 +199,7 @@ class SubExistsPizzaFromCart(APIView):
         if user.is_authenticated:
             data = request.data
             pizza_id = data['pizza_id']
+            print(pizza_id)
             pizza = Pizza.objects.all().filter(pizza_id=pizza_id).first()
             cart = Cart.objects.all().filter(user=user, is_current=True).first()
             cart_pizza = CartPizza.objects.all().filter(cart=cart, pizza=pizza).first()
@@ -227,6 +229,43 @@ class SubExistsPizzaFromCart(APIView):
         return pizza_name, price, my_dict
 
 @permission_classes([IsAuthenticated])
+class GetMyPizzas(APIView):
+    def post(self, request, *args, **kwargs):
+        # return: {'cart': [{'qty': 1, 'cheese': 4, ...}, ...], 'price': }
+        user = request.user  # Get the authenticated user
+
+        if user.is_authenticated:
+
+            return_list = []
+            my_pizzas_list = Pizza.objects.all().filter(creator=user).order_by('pizza_id')
+            for pizza in my_pizzas_list:
+                pizza_name, price, my_dict = self.price_and_ingredients(pizza.pizza_id)
+                my_dict['pizza_id'] = pizza.pizza_id
+                my_dict['name'] = pizza_name
+                my_dict['price'] = price
+                return_list.append(my_dict)
+            data = {'mypizza': return_list}
+            return Response(data=data, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    def price_and_ingredients(self, pizza_id):
+        my_dict = {}
+        price = 20000
+        pizza_name = (Pizza.objects.all().filter(pizza_id=pizza_id).first()).name
+        ingredients = PizzaIngredient.objects.all().filter(pizza=pizza_id)
+        for i in ingredients:
+            ingredient = Ingredient.objects.all().filter(ingredient_id=i.ingredient_id).first()
+            if ingredient == None:
+                continue
+            my_dict[ingredient.title] = i.quantity
+            qty = i.quantity
+            pr = ingredient.price
+            price += qty * pr
+        return pizza_name, price, my_dict
+
+
+@permission_classes([IsAuthenticated])
 class DeletePizzaFromMyPizza(APIView):
     def post(self, request, *args, **kwargs):
         user = request.user  # Get the authenticated user
@@ -238,7 +277,6 @@ class DeletePizzaFromMyPizza(APIView):
             return Response(data={}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid'}, status=status.HTTP_401_UNAUTHORIZED)
-
 
 @permission_classes([IsAuthenticated])
 class AddMyPizzaToCart(APIView):
@@ -252,12 +290,11 @@ class AddMyPizzaToCart(APIView):
                 date_created = datetime.datetime.now()
                 cart = Cart(user=user, is_current=True, date_created=date_created)
                 cart.save()
-
-            pizza = Pizza.objects.all().filter(pizza_id=data['pizza_id'])
-            cp = CartPizza.objects.all().filter(cart=cart, pizza=pizza, quantity__gt=0)
+            pizza = Pizza.objects.all().filter(pizza_id=data['pizza_id']).first()
+            cp = CartPizza.objects.all().filter(cart=cart, pizza=pizza, quantity__gt=0).first()
+            print(cp)
             if cp != None:
-                cp = CartPizza.objects.all().filter(cart=cart, pizza=pizza).update(quantity=cp.quantity + 1)
-                cp.save()
+                CartPizza.objects.all().filter(cart=cart, pizza=pizza).update(quantity=cp.quantity + 1)
             else:
                 cp = CartPizza(cart=cart, pizza=pizza, quantity=1)
                 cp.save()

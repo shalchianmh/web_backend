@@ -22,7 +22,10 @@ class OrderView(APIView):
             cart = Cart.objects.all().filter(user=user, is_current=True).first()
             if cart != None:
                 date_created = datetime.datetime.now()
-                order = Order(user=user , status='Paid' , cart=cart, date_created=date_created)
+                print(cart)
+                print(cart.cart_id)
+                print(date_created)
+                order = Order(user=user, status='Pa', cart=cart, date_created=date_created)
                 order.save()
                 Cart.objects.all().filter(user=user, is_current=True).update(is_current=False)
                 return Response(data={}, status=status.HTTP_200_OK)

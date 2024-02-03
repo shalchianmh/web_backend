@@ -15,3 +15,4 @@ user/__pycache__/
 user/migrations/
 user/migrations/__pycache__/
 web_backend/__pycache__/
+web_backend/settings.py

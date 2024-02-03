@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import *
-# from django.shortcuts import get_object_or_404
 
 
 class IngredientSerializer(serializers.ModelSerializer):

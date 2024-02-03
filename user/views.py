@@ -45,12 +45,20 @@ class UserProfileView(APIView):
     def post(self, request):
         user = request.user  # Get the authenticated user
         serializer = UserSerializer(user)
-        return Response(serializer.data)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 class DuplicateUsername(APIView):
-
     def post(self, request):
-        pass
+        username = request.data['username']
+        user = User.objects.all().filter(username=username).first()
+        print(user)
+        duplicated = 'true'
+        if user == None:
+            duplicated = 'false'
+        else:
+            duplicated = 'true'
+        return Response(data={'duplicated': duplicated}, status=status.HTTP_200_OK)
+
 
 @permission_classes([IsAuthenticated])
 class LogOutView(APIView):
@@ -58,9 +66,21 @@ class LogOutView(APIView):
     def post(self, request):
         try:
             request.user.auth_token.delete()
-            return Response(status=status.HTTP_200_OK)
+            return Response(data={}, status=status.HTTP_200_OK)
         except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={}, status=status.HTTP_400_BAD_REQUEST)
+
+@permission_classes([IsAuthenticated])
+class ChangeAddress(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def post(self, request):
+        try:
+            user = request.user
+            data = request.data
+            User.objects.all().filter(id=user.id).update(address=data['address'])
+            return Response(data={}, status=status.HTTP_200_OK)
+        except:
+            return Response(data={}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
