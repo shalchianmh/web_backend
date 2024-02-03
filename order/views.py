@@ -28,10 +28,3 @@ class OrderView(APIView):
                 return Response(data={}, status=status.HTTP_200_OK)
             else:
                 return Response(data={'error': 'Invalid'}, status=status.HTTP_401_UNAUTHORIZED)
-
-
-@permission_classes([IsAuthenticated])
-class HistoryView(APIView):
-    def post(self, request, *args, **kwargs):
-        pass
-        # todo
