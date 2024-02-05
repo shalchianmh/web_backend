@@ -8,6 +8,11 @@ Pizzato is a Django-based web application where you can make your custom pizza u
 
 ## Deployment
 
+> To run all services of this projcet clone back, front and Infrastructure together and put back and front project in infrastructure project.
+> Back: https://github.com/shalchianmh/web_backend \
+> Front: https://github.com/shalchianmh/Infrastructure \
+> Infrastructure: https://github.com/Ali-Sadeghi-Gh/web-project-front 
+
 To deploy this project after cloning it from Git Hub, you should run the requiremnet.txt file to install packages needed for python to run the app.
 
 ```bash
